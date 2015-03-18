@@ -1,0 +1,8 @@
+.autotest
+History.txt
+Manifest.txt
+README.txt
+Rakefile
+bin/kvm
+lib/kvm.rb
+test/test_kvm.rb
