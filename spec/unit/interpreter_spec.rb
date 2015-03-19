@@ -23,7 +23,7 @@ describe Kvm::Interpreter do
       if_zero :success
       push_const_int 1
       store 0
-      jump :end
+      goto :end
       label :success
       push_const_int 0
       store 0
@@ -51,7 +51,7 @@ describe Kvm::Interpreter do
       dup
       debug
       if_zero :success
-      jump :loop
+      goto :loop
 
       label :success
       ret

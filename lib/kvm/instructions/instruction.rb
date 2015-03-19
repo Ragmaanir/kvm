@@ -91,7 +91,7 @@ module Kvm
       end
     end
 
-    class Jump < Instruction
+    class Goto < Instruction
       def size
         2
       end

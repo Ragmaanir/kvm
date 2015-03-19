@@ -14,6 +14,15 @@ module Kvm
       end
     end
 
+    def run_stepwise(&block)
+      while(!environment.finished?)
+        interpret
+        block.call(self)
+      end
+    end
+
+  private
+
     def interpret
       bc = environment.read_bytecode
 

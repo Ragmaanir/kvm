@@ -24,7 +24,7 @@ module Kvm
     0x6 => Instructions::Dup.new,
     0x7 => Instructions::Ret.new,
     0x8 => Instructions::IfZero.new,
-    0x9 => Instructions::Jump.new,
+    0x9 => Instructions::Goto.new,
     0xff => Instructions::Debug.new
   )
 end
