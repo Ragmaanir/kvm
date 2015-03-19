@@ -1,9 +1,13 @@
 module Kvm
   module Instructions
 
+    def self.name_of(cls)
+      cls.name.split('::').last.underscore
+    end
+
     class Instruction
       def name
-        self.class.name.split('::').last.underscore
+        Instructions.name_of(self.class)
       end
 
       def size
@@ -26,7 +30,7 @@ module Kvm
       end
     end
 
-    class PushVar < Instruction
+    class Load < Instruction
       def size
         2
       end
@@ -37,7 +41,7 @@ module Kvm
       end
     end
 
-    class Assign < Instruction
+    class Store < Instruction
       def size
         2
       end
@@ -57,9 +61,55 @@ module Kvm
       end
     end
 
-    class PopFrame < Instruction
+    class Sub < Instruction
+      def call(env)
+        v1 = env.value_stack.pop
+        v2 = env.value_stack.pop
+        env.value_stack.push(v2 - v1)
+      end
+    end
+
+    class Dup < Instruction
+      def call(env)
+        v = env.value_stack.pop
+        env.value_stack.push(v)
+        env.value_stack.push(v)
+      end
+    end
+
+    class IfZero < Instruction
+      def size
+        2
+      end
+
+      def call(env)
+        target = env.read_bytecode
+        value = env.value_stack.pop
+        if value == 0
+          env.current_frame.instruction_counter = target
+        end
+      end
+    end
+
+    class Jump < Instruction
+      def size
+        2
+      end
+
+      def call(env)
+        env.current_frame.instruction_counter = env.read_bytecode
+      end
+    end
+
+    class Ret < Instruction
       def call(env)
         env.pop_frame
+      end
+    end
+
+    class Debug < Instruction
+      def call(env)
+        puts(env.value_stack.last)
       end
     end
 

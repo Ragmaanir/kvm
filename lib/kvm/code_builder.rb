@@ -10,12 +10,13 @@ module Kvm
     def initialize(instruction_set=DEFAULT_IS, &block)
       @result = []
       @instruction_set = instruction_set
+      @labels = {}
 
       dsl = Module.new
 
       instruction_set.each do |bytecode, instruction|
         dsl.send(:define_method, instruction.name) do |*args|
-          raise ArgumentError if args.length != (instruction.size - 1)
+          raise ArgumentError if instruction.size != args.length + 1
           append(bytecode, *args)
         end
       end
@@ -23,27 +24,19 @@ module Kvm
       self.extend(dsl)
 
       instance_eval(&block)
+
+      @result = @result.map do |value|
+        case value
+          when Integer then value
+          when Symbol then @labels[value] || raise("Undefined label: #{value}")
+          else raise
+        end
+      end
     end
 
-    # def push_const_i(val)
-    #   append(Instructions::BC_PUSH_CONST_I, val)
-    # end
-
-    # def push_var(var)
-    #   append(Instructions::BC_PUSH_VAR, var)
-    # end
-
-    # def assign(var)
-    #   append(Instructions::BC_ASSIGN, var)
-    # end
-
-    # def add_i
-    #   append(Instructions::BC_ADD_I)
-    # end
-
-    # def pop_frame
-    #   append(Instructions::BC_POP_FRAME)
-    # end
+    def label(name)
+      @labels[name] = @result.length
+    end
 
   private
 
