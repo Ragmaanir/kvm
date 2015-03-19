@@ -1,30 +1,50 @@
 # kvm
 
-* FIX (url)
+https://github.com/Ragmaanir/kvm
 
 ## DESCRIPTION:
 
-FIX (describe your package)
+Very light-weight and experimental VM implemented in Ruby.
 
 ## Features
 
-* FIX (list of features)
+* Build your bytecode using readable mnemonics by using the `Kvm::CodeBuilder`
+* Output the bytecode in a readable format with `Kvm::CodeSegment.to_s`
+* Add custom instruction with ease by creating a subclass of `Kvm::Instruction` and adding that instruction to your own custom `Kvm::InstructionSet` instance.
 
 ## Problems/Todo
 
-* FIX (list of todos/problems)
+* just a lot (classes, methods, exceptions, ...)
 
 ## Synopsis
 
-  FIX (code sample of usage)
+This is a working example of a loop:
+
+    bytecode = Kvm::CodeBuilder.build do
+      push_const_int 5
+
+      label :loop
+      push_const_int 1
+      sub
+      dup
+      debug # prints top of value stack to consonle
+      if_zero :success
+      jump :loop
+
+      label :success
+      ret
+    end
+
+    i = Kvm::Interpreter.new(bytecode)
+    i.run
 
 ## Requirements
 
-* FIX (list of requirements)
+* activesupport
 
 ## Install
 
-* FIX (sudo gem install, anything else)
+* just git clone
 
 ## Developers
 
@@ -39,7 +59,7 @@ and generate the RDoc.
 
 (The MIT License)
 
-Copyright (c) 2015 FIX
+Copyright (c) 2015 Ragmaanir
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
