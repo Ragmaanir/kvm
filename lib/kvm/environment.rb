@@ -1,11 +1,11 @@
 module Kvm
   class Environment
 
-    attr_reader :variables, :value_stack, :code_segment, :frame_stack, :debug_stream
+    attr_reader :variables, :operand_stack, :code_segment, :frame_stack, :debug_stream
 
     def initialize(code_segment)
       @variables = []
-      @value_stack = Utils::Stack.new
+      @operand_stack = Utils::Stack.new
       @frame_stack = Utils::Stack.new(Frame.new(0))
       @code_segment = code_segment
       @debug_stream = []
@@ -26,16 +26,16 @@ module Kvm
       @frame_stack.empty?
     end
 
-    def top_value
-      @value_stack.top
+    def top_operand
+      @operand_stack.top
     end
 
-    def pop_value
-      @value_stack.pop
+    def pop_operand
+      @operand_stack.pop
     end
 
-    def push_value(val)
-      @value_stack.push(val)
+    def push_operand(op)
+      @operand_stack.push(op)
     end
 
     def pop_frame
