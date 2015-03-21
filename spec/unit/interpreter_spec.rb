@@ -2,8 +2,8 @@ describe Kvm::Interpreter do
 
   it '' do
     bytecode = Kvm::CodeBuilder.build do
-      push_const_int 99
-      push_const_int 2
+      push_int 99
+      push_int 2
       add
       store 0
       ret
@@ -17,23 +17,21 @@ describe Kvm::Interpreter do
 
   it '' do
     bytecode = Kvm::CodeBuilder.build do
-      push_const_int -1
-      push_const_int 1
+      push_int -1
+      push_int 1
       add
       if_zero :success
-      push_const_int 1
+      push_int 1
       store 0
       goto :end
       label :success
-      push_const_int 0
+      push_int 0
       store 0
       label :end
       ret
     end
 
     seg = Kvm::CodeSegment.new(bytecode)
-
-    puts seg.to_s
 
     i = described_class.new(bytecode)
     i.run
@@ -43,22 +41,22 @@ describe Kvm::Interpreter do
 
   it '' do
     bytecode = Kvm::CodeBuilder.build do
-      push_const_int 5
+      push_int 5
 
       label :loop
-      push_const_int 1
+      push_int 1
       sub
       dup
       debug
-      if_zero :success
-      goto :loop
+      if_non_zero :loop
 
-      label :success
       ret
     end
 
     i = described_class.new(bytecode)
     i.run
+
+    assert{ i.environment.debug_stream == [4,3,2,1,0] }
   end
 
 end

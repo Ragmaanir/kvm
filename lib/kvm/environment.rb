@@ -1,13 +1,14 @@
 module Kvm
   class Environment
 
-    attr_reader :variables, :value_stack, :code_segment, :frame_stack
+    attr_reader :variables, :value_stack, :code_segment, :frame_stack, :debug_stream
 
     def initialize(code_segment)
       @variables = []
       @value_stack = []
       @frame_stack = [Frame.new(0)]
       @code_segment = code_segment
+      @debug_stream = []
     end
 
     def current_frame
@@ -41,6 +42,10 @@ module Kvm
     def []=(var, val)
       #raise ArgumentError if var > variables.length
       variables[var] = val
+    end
+
+    def debug(data)
+      @debug_stream << data
     end
 
   end

@@ -19,7 +19,7 @@ module Kvm
       end
     end
 
-    class PushConstInt < Instruction
+    class PushInt < Instruction
       def size
         2
       end
@@ -91,6 +91,20 @@ module Kvm
       end
     end
 
+    class IfNonZero < Instruction
+      def size
+        2
+      end
+
+      def call(env)
+        target = env.read_bytecode
+        value = env.value_stack.pop
+        if value != 0
+          env.current_frame.instruction_counter = target
+        end
+      end
+    end
+
     class Goto < Instruction
       def size
         2
@@ -109,30 +123,9 @@ module Kvm
 
     class Debug < Instruction
       def call(env)
-        puts(env.value_stack.last)
+        env.debug(env.value_stack.last)
       end
     end
 
   end
 end
-
-#
-# other =
-# self.method 1, 2
-# other.method 2, 11
-#
-#
-# x = 1
-# y = x + 1
-# puts y
-#
-#
-# push_const_i, 1
-# assign, 0
-# push_var, 0
-# push_const_i, 1
-# add_i
-# assign, 1
-# push_const System.write
-# push_var, 1
-# call
