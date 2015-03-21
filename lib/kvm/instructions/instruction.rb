@@ -22,35 +22,35 @@ module Kvm
 
     Load = Instruction.new(:load, size: 2) do |env|
       var = env.read_bytecode
-      env.value_stack.push(env[var])
+      env.push_value(env[var])
     end
 
     Store = Instruction.new(:store, size: 2) do |env|
-      val = env.value_stack.pop
+      val = env.pop_value
       var = env.read_bytecode
       env[var] = val
     end
 
     Add = Instruction.new(:add) do |env|
-      v1 = env.value_stack.pop
-      v2 = env.value_stack.pop
-      env.value_stack.push(v1 + v2)
+      v1 = env.pop_value
+      v2 = env.pop_value
+      env.push_value(v1 + v2)
     end
 
     Sub = Instruction.new(:sub) do |env|
-      v1 = env.value_stack.pop
-      v2 = env.value_stack.pop
-      env.value_stack.push(v2 - v1)
+      v1 = env.pop_value
+      v2 = env.pop_value
+      env.push_value(v2 - v1)
     end
 
     Dup = Instruction.new(:dup) do |env|
-      v = env.value_stack.top
-      env.value_stack.push(v)
+      v = env.top_value
+      env.push_value(v)
     end
 
     IfZero = Instruction.new(:if_zero, size: 2) do |env|
       target = env.read_bytecode
-      value = env.value_stack.pop
+      value = env.pop_value
       if value == 0
         env.current_frame.instruction_counter = target
       end
@@ -58,7 +58,7 @@ module Kvm
 
     IfNonZero = Instruction.new(:if_non_zero, size: 2) do |env|
       target = env.read_bytecode
-      value = env.value_stack.pop
+      value = env.pop_value
       if value != 0
         env.current_frame.instruction_counter = target
       end
@@ -73,7 +73,7 @@ module Kvm
     end
 
     Debug = Instruction.new(:debug) do |env|
-      env.debug(env.value_stack.top)
+      env.debug(env.top_value)
     end
 
   end

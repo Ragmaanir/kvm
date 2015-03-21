@@ -26,6 +26,14 @@ module Kvm
       @frame_stack.empty?
     end
 
+    def top_value
+      @value_stack.top
+    end
+
+    def pop_value
+      @value_stack.pop
+    end
+
     def push_value(val)
       @value_stack.push(val)
     end

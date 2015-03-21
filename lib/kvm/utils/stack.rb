@@ -25,6 +25,7 @@ module Kvm
         @stack.last
       end
 
+
     end
   end
 end
