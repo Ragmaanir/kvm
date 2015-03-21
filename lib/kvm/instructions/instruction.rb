@@ -1,130 +1,79 @@
 module Kvm
   module Instructions
 
-    def self.name_of(cls)
-      cls.name.split('::').last.underscore
-    end
-
     class Instruction
-      def name
-        Instructions.name_of(self.class)
-      end
+      attr_reader :name, :size, :code
 
-      def size
-        1
+      def initialize(name, size: 1, &block)
+        @name = name
+        @size = size
+        @code = block
       end
 
       def call(env)
-        raise NotImplementedError
+        code.call(env)
       end
     end
 
-    class PushInt < Instruction
-      def size
-        2
-      end
+    PushInt = Instruction.new(:push_int, size: 2) do |env|
+      const = env.read_bytecode
+      env.push_value(const)
+    end
 
-      def call(env)
-        const = env.read_bytecode
-        env.push_value(const)
+    Load = Instruction.new(:load, size: 2) do |env|
+      var = env.read_bytecode
+      env.value_stack.push(env[var])
+    end
+
+    Store = Instruction.new(:store, size: 2) do |env|
+      val = env.value_stack.pop
+      var = env.read_bytecode
+      env[var] = val
+    end
+
+    Add = Instruction.new(:add) do |env|
+      v1 = env.value_stack.pop
+      v2 = env.value_stack.pop
+      env.value_stack.push(v1 + v2)
+    end
+
+    Sub = Instruction.new(:sub) do |env|
+      v1 = env.value_stack.pop
+      v2 = env.value_stack.pop
+      env.value_stack.push(v2 - v1)
+    end
+
+    Dup = Instruction.new(:dup) do |env|
+      v = env.value_stack.top
+      env.value_stack.push(v)
+    end
+
+    IfZero = Instruction.new(:if_zero, size: 2) do |env|
+      target = env.read_bytecode
+      value = env.value_stack.pop
+      if value == 0
+        env.current_frame.instruction_counter = target
       end
     end
 
-    class Load < Instruction
-      def size
-        2
-      end
-
-      def call(env)
-        var = env.read_bytecode
-        env.value_stack.push(env[var])
+    IfNonZero = Instruction.new(:if_non_zero, size: 2) do |env|
+      target = env.read_bytecode
+      value = env.value_stack.pop
+      if value != 0
+        env.current_frame.instruction_counter = target
       end
     end
 
-    class Store < Instruction
-      def size
-        2
-      end
-
-      def call(env)
-        val = env.value_stack.pop
-        var = env.read_bytecode
-        env[var] = val
-      end
+    Goto = Instruction.new(:goto, size: 2) do |env|
+      env.current_frame.instruction_counter = env.read_bytecode
     end
 
-    class Add < Instruction
-      def call(env)
-        v1 = env.value_stack.pop
-        v2 = env.value_stack.pop
-        env.value_stack.push(v1 + v2)
-      end
+    Ret = Instruction.new(:ret) do |env|
+      env.pop_frame
     end
 
-    class Sub < Instruction
-      def call(env)
-        v1 = env.value_stack.pop
-        v2 = env.value_stack.pop
-        env.value_stack.push(v2 - v1)
-      end
-    end
-
-    class Dup < Instruction
-      def call(env)
-        v = env.value_stack.pop
-        env.value_stack.push(v)
-        env.value_stack.push(v)
-      end
-    end
-
-    class IfZero < Instruction
-      def size
-        2
-      end
-
-      def call(env)
-        target = env.read_bytecode
-        value = env.value_stack.pop
-        if value == 0
-          env.current_frame.instruction_counter = target
-        end
-      end
-    end
-
-    class IfNonZero < Instruction
-      def size
-        2
-      end
-
-      def call(env)
-        target = env.read_bytecode
-        value = env.value_stack.pop
-        if value != 0
-          env.current_frame.instruction_counter = target
-        end
-      end
-    end
-
-    class Goto < Instruction
-      def size
-        2
-      end
-
-      def call(env)
-        env.current_frame.instruction_counter = env.read_bytecode
-      end
-    end
-
-    class Ret < Instruction
-      def call(env)
-        env.pop_frame
-      end
-    end
-
-    class Debug < Instruction
-      def call(env)
-        env.debug(env.value_stack.last)
-      end
+    Debug = Instruction.new(:debug) do |env|
+      env.debug(env.value_stack.top)
     end
 
   end

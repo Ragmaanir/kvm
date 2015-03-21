@@ -53,7 +53,7 @@ module Kvm
 
       mnemonics.map do |(byte_no, name, values)|
         str << "%4d: " % byte_no
-        str << name
+        str << name.to_s
         str << " " + values.join(',') if values.present?
         str << "\n"
       end

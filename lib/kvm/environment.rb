@@ -5,14 +5,14 @@ module Kvm
 
     def initialize(code_segment)
       @variables = []
-      @value_stack = []
-      @frame_stack = [Frame.new(0)]
+      @value_stack = Utils::Stack.new
+      @frame_stack = Utils::Stack.new(Frame.new(0))
       @code_segment = code_segment
       @debug_stream = []
     end
 
     def current_frame
-      frame_stack.last
+      frame_stack.top
     end
 
     def read_bytecode
@@ -27,7 +27,7 @@ module Kvm
     end
 
     def push_value(val)
-      @value_stack << val
+      @value_stack.push(val)
     end
 
     def pop_frame

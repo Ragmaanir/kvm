@@ -3,6 +3,8 @@ require 'active_support/core_ext/string'
 
 require 'kvm/version'
 
+require 'kvm/utils/stack'
+
 require 'kvm/frame'
 require 'kvm/environment'
 require 'kvm/instructions/instruction'

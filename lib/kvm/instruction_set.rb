@@ -16,16 +16,16 @@ module Kvm
   end
 
   DEFAULT_IS = InstructionSet.new(
-    0x1 => Instructions::PushInt.new,
-    0x2 => Instructions::Load.new,
-    0x3 => Instructions::Store.new,
-    0x4 => Instructions::Add.new,
-    0x5 => Instructions::Sub.new,
-    0x6 => Instructions::Dup.new,
-    0x7 => Instructions::Ret.new,
-    0x8 => Instructions::IfZero.new,
-    0x9 => Instructions::IfNonZero.new,
-    0x10 => Instructions::Goto.new,
-    0xff => Instructions::Debug.new
+    0x1 => Instructions::PushInt,
+    0x2 => Instructions::Load,
+    0x3 => Instructions::Store,
+    0x4 => Instructions::Add,
+    0x5 => Instructions::Sub,
+    0x6 => Instructions::Dup,
+    0x7 => Instructions::Ret,
+    0x8 => Instructions::IfZero,
+    0x9 => Instructions::IfNonZero,
+    0x10 => Instructions::Goto,
+    0xff => Instructions::Debug
   )
 end
