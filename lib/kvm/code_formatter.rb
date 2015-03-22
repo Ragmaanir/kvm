@@ -1,10 +1,10 @@
 module Kvm
-  class CodeSegment
+  class CodeFormatter
 
-    attr_reader :bytecode, :instruction_set
+    attr_reader :code_block, :instruction_set
 
-    def initialize(bytecode, instruction_set: DEFAULT_IS)
-      @bytecode = bytecode
+    def initialize(code_block, instruction_set: DEFAULT_IS)
+      @code_block = code_block
       @instruction_set = instruction_set
     end
 
@@ -15,8 +15,8 @@ module Kvm
     def each_instruction
       i = 0
 
-      while i < @bytecode.length
-        bc = @bytecode[i]
+      while i < @code_block.code.length
+        bc = @code_block.code[i]
         inst = instruction_set[bc] || raise("Invalid bytecode #{bc} at byte #{i} for instruction set")
 
         yield(i, inst)
@@ -38,7 +38,7 @@ module Kvm
         mnemonics << [
           i,
           inst.name,
-          @bytecode[(i+1), inst.size - 1]
+          @code_block.code[(i+1), inst.size - 1]
         ]
       end
 

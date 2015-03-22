@@ -1,7 +1,7 @@
 describe Kvm::CodeBuilder do
 
   it '' do
-    bytecode = described_class.build do
+    code_block = described_class.build do
       push_int 99
       push_int 2
       add
@@ -17,13 +17,13 @@ describe Kvm::CodeBuilder do
    7: ret
     BYTECODE
 
-    seg = Kvm::CodeSegment.new(bytecode)
+    f = Kvm::CodeFormatter.new(code_block)
 
-    assert{ seg.to_s == output }
+    assert{ f.to_s == output }
   end
 
   it '' do
-    bytecode = described_class.build do
+    code_block = described_class.build do
       push_int -1
       push_int 1
       add
@@ -51,13 +51,13 @@ describe Kvm::CodeBuilder do
   17: ret
     BYTECODE
 
-    seg = Kvm::CodeSegment.new(bytecode)
+    f = Kvm::CodeFormatter.new(code_block)
 
-    assert{ seg.to_s == output }
+    assert{ f.to_s == output }
   end
 
   it '' do
-    bytecode = described_class.build do
+    code_block = described_class.build do
       push_int 5
 
       label :loop

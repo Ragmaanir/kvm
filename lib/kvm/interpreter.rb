@@ -3,8 +3,8 @@ module Kvm
 
     attr_reader :environment, :instruction_set
 
-    def initialize(code, instruction_set: DEFAULT_IS)
-      @environment = Environment.new(code)
+    def initialize(methods, instruction_set: DEFAULT_IS)
+      @environment = Environment.new(methods)
       @instruction_set = instruction_set
     end
 

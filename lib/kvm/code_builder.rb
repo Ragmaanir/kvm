@@ -8,8 +8,9 @@ module Kvm
     attr_reader :result
 
     def initialize(instruction_set=DEFAULT_IS, &block)
-      @result = []
+      @code = []
       @instruction_set = instruction_set
+      @constants = []
       @labels = {}
 
       dsl = Module.new
@@ -25,23 +26,34 @@ module Kvm
 
       instance_eval(&block)
 
-      @result = @result.map do |value|
+      @code = @code.map do |value|
         case value
           when Integer then value
           when Symbol then @labels[value] || raise("Undefined label: #{value}")
-          else raise
+          else raise("Invalid bytecode element: #{value.inspect}")
         end
       end
+
+      @result = CodeBlock.new(@constants, @code)
     end
 
     def label(name)
-      @labels[name] = @result.length
+      @labels[name] = @code.length
+    end
+
+    def const(val)
+      if idx = @constants.index(val)
+        idx
+      else
+        @constants << val
+        @constants.length - 1
+      end
     end
 
   private
 
     def append(*args)
-      @result += args
+      @code += args
     end
 
   end

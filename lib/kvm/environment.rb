@@ -1,29 +1,37 @@
 module Kvm
   class Environment
 
-    attr_reader :variables, :operand_stack, :code_segment, :frame_stack, :debug_stream
+    attr_reader :debug_stream
 
-    def initialize(code_segment)
-      @variables = []
+    def initialize(methods)
+      @methods = methods
       @operand_stack = Utils::Stack.new
-      @frame_stack = Utils::Stack.new(Frame.new(0))
-      @code_segment = code_segment
+      @frame_stack = Utils::Stack.new(Frame.new(find_method(:main), 10))
       @debug_stream = []
     end
 
-    def current_frame
-      frame_stack.top
-    end
-
     def read_bytecode
-      raise "No more code" if current_frame.instruction_counter == code_segment.length
-      code = code_segment[current_frame.instruction_counter]
-      current_frame.instruction_counter += 1
-      code
+      current_frame.read_bytecode
     end
 
     def finished?
       @frame_stack.empty?
+    end
+
+    def current_frame
+      @frame_stack.top
+    end
+
+    def pop_frame
+      @frame_stack.pop
+    end
+
+    def constants
+      current_frame.method.constants
+    end
+
+    def call(object, method_name)
+      @frame_stack.push(Frame.new(find_method(method_name), 10))
     end
 
     def top_operand
@@ -38,22 +46,27 @@ module Kvm
       @operand_stack.push(op)
     end
 
-    def pop_frame
-      @frame_stack.pop
-    end
-
     def [](var)
-      raise ArgumentError if var > variables.length
-      variables[var]
+      current_frame[var]
     end
 
     def []=(var, val)
-      #raise ArgumentError if var > variables.length
-      variables[var] = val
+      current_frame[var] = val
+    end
+
+    def breakpoint
+      require 'byebug'
+      byebug
     end
 
     def debug(data)
       @debug_stream << data
+    end
+
+  private
+
+    def find_method(name)
+      @methods.find{ |m| m.name.to_s == name.to_s } || raise("Method not found: #{name}")
     end
 
   end

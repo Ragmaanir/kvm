@@ -22,10 +22,13 @@ module Kvm
     0x4 => Instructions::Add,
     0x5 => Instructions::Sub,
     0x6 => Instructions::Dup,
-    0x7 => Instructions::Ret,
     0x8 => Instructions::IfZero,
     0x9 => Instructions::IfNonZero,
     0x10 => Instructions::Goto,
-    0xff => Instructions::Debug
+    0x30 => Instructions::Call,
+    0x31 => Instructions::Ret,
+    0xf0 => Instructions::Print,
+    0xf1 => Instructions::Breakpoint,
+    0xf2 => Instructions::Debug
   )
 end

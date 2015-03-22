@@ -17,11 +17,12 @@ module Kvm
       end
 
       def pop
-        raise if empty?
+        raise 'Stack empty' if empty?
         @stack.pop
       end
 
       def top
+        raise 'Stack empty' if empty?
         @stack.last
       end
 

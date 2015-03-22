@@ -13,6 +13,10 @@ module Kvm
       def call(env)
         code.call(env)
       end
+
+      def inspect
+        "#{self.class.name}(#{name}, #{size})"
+      end
     end
 
     PushInt = Instruction.new(:push_int, size: 2) do |env|
@@ -68,8 +72,22 @@ module Kvm
       env.current_frame.instruction_counter = env.read_bytecode
     end
 
+    Call = Instruction.new(:call, size: 2) do |env|
+      obj = env.pop_operand
+      const_id = env.read_bytecode
+      env.call(obj, env.constants[const_id])
+    end
+
     Ret = Instruction.new(:ret) do |env|
       env.pop_frame
+    end
+
+    Print = Instruction.new(:print) do |env|
+      puts env.top_operand
+    end
+
+    Breakpoint = Instruction.new(:breakpoint) do |env|
+      env.breakpoint
     end
 
     Debug = Instruction.new(:debug) do |env|
