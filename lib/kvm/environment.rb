@@ -3,11 +3,17 @@ module Kvm
 
     attr_reader :debug_stream
 
-    def initialize(methods)
-      @methods = methods
+    def initialize(program)
+      @program = program
       @operand_stack = Utils::Stack.new
-      @frame_stack = Utils::Stack.new(Frame.new(find_method(:main), 10))
+      @frame_stack = Utils::Stack.new(Frame.new(program.main_method, 10))
       @debug_stream = []
+
+      push_operand(program.main_object)
+    end
+
+    def current_instruction_counter
+      current_frame.instruction_counter
     end
 
     def read_bytecode
@@ -31,7 +37,31 @@ module Kvm
     end
 
     def call(object, method_name)
-      @frame_stack.push(Frame.new(find_method(method_name), 10))
+      # cls_id, meth_id = method_name.split('#')
+      # cls = @program.get_object(cls_id)
+      # meth = cls.get_method(meth_id)
+      # new_frame = Frame.new(meth, 10)
+      # @frame_stack.push(new_frame)
+      cls_id, meth_id = if method_name.include?('.')
+        method_name.split('.')
+      else
+        method_name.split('#')
+      end
+
+      cls = @program.get_object(cls_id)
+
+      meth = if method_name.include?('.')
+        cls.get_object_method(meth_id)
+      else
+        cls.get_method(meth_id)
+      end
+
+      if meth.hardcoded?
+        meth.code.call(self)
+      else
+        new_frame = Frame.new(meth, 10)
+        @frame_stack.push(new_frame)
+      end
     end
 
     def top_operand
@@ -61,12 +91,6 @@ module Kvm
 
     def debug(data)
       @debug_stream << data
-    end
-
-  private
-
-    def find_method(name)
-      @methods.find{ |m| m.name.to_s == name.to_s } || raise("Method not found: #{name}")
     end
 
   end

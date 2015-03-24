@@ -1,86 +1,106 @@
 describe Kvm::Interpreter do
 
-  it '' do
-    code_block = Kvm::CodeBuilder.build do
-      push_int 99
-      push_int 2
-      add
-      debug
-      store 0
-      ret
+  it 'raises helpful error message when bytecode invalid' do
+    prog = Kvm::ProgramBuilder.build('App.run') do
+      define_class('App') do
+        class_method(:run) do
+          pop
+          pop # raises
+          ret
+        end
+      end
     end
 
-    m = Kvm::Method.new(:main, code_block)
-    i = described_class.new([m])
-    i.run
-
-    assert{ i.environment.debug_stream == [101] }
-    #assert{ i.environment.variables == [101] }
+    i = described_class.new(prog)
+    expect{ i.run }.to raise_error(Kvm::Interpreter::ExecutionError)
   end
 
-  it '' do
-    code_block = Kvm::CodeBuilder.build do
-      push_int -1
-      push_int 1
-      add
-      if_zero :success
-      push_int 1
-      store 0
-      goto :end
-      label :success
-      push_int 0
-      store 0
-      label :end
-      ret
+  it 'calls the passed class method on the passed object' do
+    prog = Kvm::ProgramBuilder.build('App.run') do
+      define_class('App') do
+        class_method(:run) do
+          debug
+          ret
+        end
+      end
     end
 
-    m = Kvm::Method.new(:main, code_block)
-    i = described_class.new([m])
+    i = described_class.new(prog)
     i.run
 
-    #assert{ i.environment.variables == [0] }
+    assert{ i.environment.debug_stream == [prog.objects['App']] }
   end
 
-  it '' do
-    code_block = Kvm::CodeBuilder.build do
-      push_int 5
+  it 'loops' do
+    prog = Kvm::ProgramBuilder.build('App.run') do
+      define_class('App') do
+        class_method(:run) do
+          push_int 5
 
-      label :loop
-      push_int 1
-      sub
-      dup
-      debug
-      if_non_zero :loop
+          label :loop
+          debug
+          push_int 1
+          sub
+          dup
+          if_non_zero :loop
 
-      ret
+          ret
+        end
+      end
     end
 
-    m = Kvm::Method.new(:main, code_block)
-    i = described_class.new([m])
+    i = described_class.new(prog)
     i.run
 
-    assert{ i.environment.debug_stream == [4,3,2,1,0] }
+    assert{ i.environment.debug_stream == [5, 4, 3, 2, 1] }
   end
 
-  it '' do
-    m1_block = Kvm::CodeBuilder.build do
-      push_int 1337
-      ret
+  it 'calls a method' do
+    prog = Kvm::ProgramBuilder.build('App.run') do
+      define_class('App') do
+        class_method(:run) do
+          dup
+          call const('App.other')
+          debug
+          ret
+        end
+
+        class_method(:other) do
+          push_str const('other')
+          ret
+        end
+      end
     end
 
-    m2_block = Kvm::CodeBuilder.build do
-      push_int 1
-      call const('other')
-      debug
-      ret
-    end
-
-    m1 = Kvm::Method.new(:main, m2_block)
-    m2 = Kvm::Method.new(:other, m1_block)
-    i = described_class.new([m1, m2])
+    i = described_class.new(prog)
     i.run
 
-    assert{ i.environment.debug_stream == [1337] }
+    assert{ i.environment.debug_stream == ['other'] }
+  end
+
+  it 'calls a hardcoded method' do
+    prog = Kvm::ProgramBuilder.build('App.run') do
+      define_class('String') do
+        method(:length, [], hardcoded: true) do |env|
+          env.push_operand(env.top_operand.length)
+        end
+      end
+
+      define_class('App') do
+        class_method(:run) do
+          push_str const('Foobar')
+          dup
+          call const('String#length')
+          debug
+          ret
+        end
+      end
+    end
+
+    i = described_class.new(prog)
+    i.run
+
+    assert{ i.environment.debug_stream == [6] }
   end
 
 end

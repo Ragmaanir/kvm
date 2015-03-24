@@ -24,6 +24,12 @@ module Kvm
       env.push_operand(const)
     end
 
+    PushStr = Instruction.new(:push_str, size: 2) do |env|
+      const_idx = env.read_bytecode
+      str = env.constants[const_idx]
+      env.push_operand(str)
+    end
+
     Load = Instruction.new(:load, size: 2) do |env|
       var = env.read_bytecode
       env.push_operand(env[var])
@@ -50,6 +56,10 @@ module Kvm
     Dup = Instruction.new(:dup) do |env|
       v = env.top_operand
       env.push_operand(v)
+    end
+
+    Pop = Instruction.new(:pop) do |env|
+      env.pop_operand
     end
 
     IfZero = Instruction.new(:if_zero, size: 2) do |env|

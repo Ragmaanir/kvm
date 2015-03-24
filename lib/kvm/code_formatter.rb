@@ -8,10 +8,6 @@ module Kvm
       @instruction_set = instruction_set
     end
 
-    def validate
-
-    end
-
     def each_instruction
       i = 0
 
