@@ -24,7 +24,7 @@ module Kvm
     end
 
     def method(name, signature=[], options={}, &block)
-      code = if options[:hardcoded]
+      code = if options[:native]
         block
       else
         CodeBuilder.build(&block)
@@ -34,7 +34,7 @@ module Kvm
     end
 
     def class_method(name, signature=[], options={}, &block)
-      code = if options[:hardcoded]
+      code = if options[:native]
         block
       else
         CodeBuilder.build(&block)

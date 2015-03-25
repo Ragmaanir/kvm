@@ -12,7 +12,16 @@ describe Kvm::Interpreter do
     end
 
     i = described_class.new(prog)
-    expect{ i.run }.to raise_error(Kvm::Interpreter::ExecutionError)
+    expect{ i.run }.to raise_error(Kvm::Interpreter::ExecutionError, <<-ERROR)
+Error(RuntimeError): Stack empty
+At bytecode 1 in:
+App: public run()
+-----
+0: pop
+1: pop
+2: ret
+-----
+ERROR
   end
 
   it 'calls the passed class method on the passed object' do
@@ -78,10 +87,10 @@ describe Kvm::Interpreter do
     assert{ i.environment.debug_stream == ['other'] }
   end
 
-  it 'calls a hardcoded method' do
+  it 'calls a native method' do
     prog = Kvm::ProgramBuilder.build('App.run') do
       define_class('String') do
-        method(:length, [], hardcoded: true) do |env|
+        method(:length, [], native: true) do |env|
           env.push_operand(env.top_operand.length)
         end
       end

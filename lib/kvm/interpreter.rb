@@ -8,8 +8,9 @@ module Kvm
 
       attr_reader :error, :environment
 
-      def initialize(error, method, instruction_counter, instruction_set)
+      def initialize(error, object, method, instruction_counter, instruction_set)
         @error = error
+        @object = object
         @method = method
         @instruction_counter = instruction_counter
         @instruction_set = instruction_set
@@ -21,7 +22,7 @@ module Kvm
         <<-ERROR.gsub(/^\s+/,'')
         Error(#{error.class}): #{error.message}
         At bytecode #{@instruction_counter} in:
-        #{@method.mangled_name}
+        #{@object.name}: #{@method.mangled_name}
         -----
         #{f.to_s}
         -----
@@ -70,7 +71,7 @@ module Kvm
         raise "invalid bytecode: #{bc.inspect}"
       end
     rescue RuntimeError => e
-      raise ExecutionError.new(e, environment.current_frame.method, counter, instruction_set)
+      raise ExecutionError.new(e, environment.current_object, environment.current_method, counter, instruction_set)
     end
   end
 end

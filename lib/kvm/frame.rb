@@ -1,9 +1,10 @@
 module Kvm
   class Frame
 
-    attr_accessor :method, :instruction_counter, :max_variables
+    attr_accessor :object, :method, :instruction_counter, :max_variables
 
-    def initialize(method, max_variables)
+    def initialize(object, method, max_variables)
+      @object = object
       @method = method
       @instruction_counter = 0
       @max_variables = max_variables

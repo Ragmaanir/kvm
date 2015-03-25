@@ -3,13 +3,13 @@ module Kvm
 
     attr_reader :name, :signature, :code_block
 
-    def initialize(name, signature, code_block:, visibility: :public, hardcoded: false)
+    def initialize(name, signature, code_block:, visibility: :public, native: false)
       #raise ArgumentError if code_block && hardcoded
       @name = name
       @signature = signature
       @code_block = code_block
       @visibility = visibility
-      @hardcoded = hardcoded
+      @native = native
     end
 
     def constants
@@ -17,7 +17,7 @@ module Kvm
     end
 
     def code
-      if hardcoded?
+      if native?
         @code_block
       else
         @code_block.code
@@ -28,8 +28,8 @@ module Kvm
       @visibility
     end
 
-    def hardcoded?
-      @hardcoded
+    def native?
+      @native
     end
 
     def mangled_name

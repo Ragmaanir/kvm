@@ -6,10 +6,12 @@ module Kvm
     def initialize(program)
       @program = program
       @operand_stack = Utils::Stack.new
-      @frame_stack = Utils::Stack.new(Frame.new(program.main_method, 10))
+      @frame_stack = Utils::Stack.new(Frame.new(program.main_object, program.main_method, 10))
+      #@frame_stack = Utils::Stack.new()
       @debug_stream = []
 
       push_operand(program.main_object)
+      #call(program.main_object, program.main_method)
     end
 
     def current_instruction_counter
@@ -26,6 +28,14 @@ module Kvm
 
     def current_frame
       @frame_stack.top
+    end
+
+    def current_object
+      current_frame.object
+    end
+
+    def current_method
+      current_frame.method
     end
 
     def pop_frame
@@ -56,10 +66,10 @@ module Kvm
         cls.get_method(meth_id)
       end
 
-      if meth.hardcoded?
+      if meth.native?
         meth.code.call(self)
       else
-        new_frame = Frame.new(meth, 10)
+        new_frame = Frame.new(object, meth, 10)
         @frame_stack.push(new_frame)
       end
     end
