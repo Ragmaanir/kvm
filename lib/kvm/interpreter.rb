@@ -17,7 +17,7 @@ module Kvm
       end
 
       def to_s
-        f = CodeFormatter.new(@method.code_block, instruction_set: @instruction_set)
+        f = Debugging::CodeFormatter.new(@method.code_block, instruction_set: @instruction_set)
 
         <<-ERROR.gsub(/^\s+/,'')
         Error(#{error.class}): #{error.message}
@@ -46,8 +46,8 @@ module Kvm
 
     def run_stepwise(&block)
       while running?
+        block.call(environment)
         interpret
-        block.call(self)
       end
     end
 

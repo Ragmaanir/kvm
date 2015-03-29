@@ -12,15 +12,17 @@ module Kvm
       @superclass = superclass
       @instance_methods = []
       @object_methods = []
-      @attributes = []
+      @fields = []
 
       instance_eval(&block)
 
-      @result = KClass.new(@name, @superclass, @attributes, @object_methods, @instance_methods)
+      @result = KClass.new(@name, @superclass, @fields, @object_methods, @instance_methods)
     end
 
-    def attribute(name, *args)
-      #@attributes <<
+    def field(name, type, *args)
+      field = Field.new(name, type)
+      raise ArgumentError if @fields.include?(field)
+      @fields << field
     end
 
     def method(name, signature=[], options={}, &block)

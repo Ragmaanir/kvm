@@ -17,7 +17,7 @@ describe Kvm::CodeBuilder do
    7: ret
     BYTECODE
 
-    f = Kvm::CodeFormatter.new(code_block)
+    f = Kvm::Debugging::CodeFormatter.new(code_block)
 
     assert{ f.to_s == output }
   end
@@ -51,7 +51,7 @@ describe Kvm::CodeBuilder do
   17: ret
     BYTECODE
 
-    f = Kvm::CodeFormatter.new(code_block)
+    f = Kvm::Debugging::CodeFormatter.new(code_block)
 
     assert{ f.to_s == output }
   end

@@ -112,4 +112,39 @@ ERROR
     assert{ i.environment.debug_stream == [6] }
   end
 
+  it 'sets an attribute on an object' do
+    prog = Kvm::ProgramBuilder.build('App.run') do
+      define_class('Foo') do
+        field :name, 'String'
+        field :age, 'Int'
+      end
+
+      define_class('App') do
+        class_method(:run) do
+          allocate const('Foo')
+          dup
+          dup
+          #call const('Foo#initialize')
+          get_field const('Foo|name')
+          debug
+          pop
+          push_str const('Yolo')
+          set_field const('Foo|name')
+          get_field const('Foo|name')
+          debug
+          ret
+        end
+      end
+    end
+
+    i = described_class.new(prog)
+    i.run
+
+    #Kvm::Debugging::StepwiseDebugger.new(i).run
+
+    assert{ i.environment.debug_stream == [nil, 'Yolo'] }
+  end
+
+  it 'creates an instance of a class'
+
 end

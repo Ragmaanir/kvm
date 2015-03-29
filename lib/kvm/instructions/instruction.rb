@@ -92,6 +92,28 @@ module Kvm
       env.pop_frame
     end
 
+    Allocate = Instruction.new(:allocate, size: 2) do |env|
+      const_id = env.read_bytecode
+      cls = env.find_object(env.constants[const_id])
+      obj = env.allocate(cls)
+      env.push_operand(obj)
+    end
+
+    GetField = Instruction.new(:get_field, size: 2) do |env|
+      field_id = env.read_bytecode
+      field_offset = 0 # FIXME
+      obj = env.pop_operand
+      env.push_operand(obj[field_offset])
+    end
+
+    SetField = Instruction.new(:set_field, size: 2) do |env|
+      field_id = env.read_bytecode
+      field_offset = 0 # FIXME
+      value = env.pop_operand
+      obj = env.pop_operand
+      obj[field_offset] = value
+    end
+
     Print = Instruction.new(:print) do |env|
       puts env.top_operand
     end

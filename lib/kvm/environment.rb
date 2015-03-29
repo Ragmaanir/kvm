@@ -1,7 +1,7 @@
 module Kvm
   class Environment
 
-    attr_reader :debug_stream
+    attr_reader :operand_stack, :debug_stream
 
     def initialize(program)
       @program = program
@@ -58,7 +58,7 @@ module Kvm
         method_name.split('#')
       end
 
-      cls = @program.get_object(cls_id)
+      cls = find_object(cls_id)
 
       meth = if method_name.include?('.')
         cls.get_object_method(meth_id)
@@ -92,6 +92,14 @@ module Kvm
 
     def []=(var, val)
       current_frame[var] = val
+    end
+
+    def find_object(name)
+      @program.get_object(name) || raise("Could not find object named: #{name.inspect}")
+    end
+
+    def allocate(cls)
+      KInstance.new(cls)
     end
 
     def breakpoint

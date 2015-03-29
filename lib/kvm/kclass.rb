@@ -1,12 +1,12 @@
 module Kvm
   class KClass
 
-    attr_reader :name, :superclass, :attributes, :object_methods, :instance_methods
+    attr_reader :name, :superclass, :fields, :object_methods, :instance_methods
 
-    def initialize(name, superclass, attributes, object_methods, instance_methods)
+    def initialize(name, superclass, fields, object_methods, instance_methods)
       @name = name
       @superclass = superclass
-      @attributes = attributes
+      @fields = fields
       @object_methods = object_methods
       @instance_methods = instance_methods
     end

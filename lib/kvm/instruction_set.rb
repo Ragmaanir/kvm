@@ -29,6 +29,9 @@ module Kvm
     0x32 => Instructions::Goto,
     0x33 => Instructions::Call,
     0x34 => Instructions::Ret,
+    0x40 => Instructions::Allocate,
+    0x41 => Instructions::GetField,
+    0x42 => Instructions::SetField,
     0xf0 => Instructions::Print,
     0xf1 => Instructions::Breakpoint,
     0xf2 => Instructions::Debug
