@@ -100,18 +100,20 @@ module Kvm
     end
 
     GetField = Instruction.new(:get_field, size: 2) do |env|
-      field_id = env.read_bytecode
-      field_offset = 0 # FIXME
+      attribute_id = env.read_bytecode
+      attribute_offset = env.constants[attribute_id]
       obj = env.pop_operand
-      env.push_operand(obj[field_offset])
+      raise "Operand is no instance: #{obj}" unless obj.is_a?(KInstance)
+      env.push_operand(obj[attribute_offset])
     end
 
     SetField = Instruction.new(:set_field, size: 2) do |env|
-      field_id = env.read_bytecode
-      field_offset = 0 # FIXME
+      attribute_id = env.read_bytecode
+      attribute_offset = env.constants[attribute_id]
       value = env.pop_operand
       obj = env.pop_operand
-      obj[field_offset] = value
+      raise "Operand is no instance: #{obj}" unless obj.is_a?(KInstance)
+      obj[attribute_offset] = value
     end
 
     Print = Instruction.new(:print) do |env|

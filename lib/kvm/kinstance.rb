@@ -7,11 +7,13 @@ module Kvm
     end
 
     def []=(attribute, value)
-      @attributes[attribute] = value
+      slot = @klass.attribute_slot(attribute)
+      @attributes[slot] = value
     end
 
     def [](attribute)
-      @attributes[attribute]
+      slot = @klass.attribute_slot(attribute)
+      @attributes[slot]
     end
 
     def to_s

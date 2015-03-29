@@ -11,6 +11,10 @@ module Kvm
       @instance_methods = instance_methods
     end
 
+    def attribute_slot(name)
+      @fields.find_index{ |f| f.name.to_s == name.to_s } || raise("Attribute not found: #{name}")
+    end
+
     def get_method(id)
       raise ArgumentError unless id
       instance_methods.find{ |m| m.name.to_s == id } || raise("Could not find instance method #{id.inspect} in #{name}")

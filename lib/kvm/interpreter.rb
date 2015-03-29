@@ -17,15 +17,18 @@ module Kvm
       end
 
       def to_s
-        f = Debugging::CodeFormatter.new(@method.code_block, instruction_set: @instruction_set)
+        f = Debugging::CodeFormatter.new(
+          @method.code_block,
+          instruction_set: @instruction_set,
+          current_instruction: @instruction_counter
+        )
 
-        <<-ERROR.gsub(/^\s+/,'')
-        Error(#{error.class}): #{error.message}
-        At bytecode #{@instruction_counter} in:
-        #{@object.name}: #{@method.mangled_name}
-        -----
-        #{f.to_s}
-        -----
+        <<-ERROR.gsub(/^\s+\|/,'')
+        |Error(#{error.class}): #{error.message}
+        |#{@object.name}: #{@method.mangled_name}
+        |#{'-'*30}
+        |#{f.to_s}
+        |#{'-'*30}
         ERROR
       end
     end
@@ -70,7 +73,7 @@ module Kvm
       else
         raise "invalid bytecode: #{bc.inspect}"
       end
-    rescue RuntimeError => e
+    rescue StandardError => e
       raise ExecutionError.new(e, environment.current_object, environment.current_method, counter, instruction_set)
     end
   end

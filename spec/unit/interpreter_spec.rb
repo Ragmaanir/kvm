@@ -12,15 +12,15 @@ describe Kvm::Interpreter do
     end
 
     i = described_class.new(prog)
+
     expect{ i.run }.to raise_error(Kvm::Interpreter::ExecutionError, <<-ERROR)
 Error(RuntimeError): Stack empty
-At bytecode 1 in:
 App: public run()
------
-0: pop
-1: pop
-2: ret
------
+------------------------------
+    0: pop
+>   1: pop
+    2: ret
+------------------------------
 ERROR
   end
 
@@ -124,13 +124,20 @@ ERROR
           allocate const('Foo')
           dup
           dup
+          dup
           #call const('Foo#initialize')
-          get_field const('Foo|name')
+          get_field const('name')
           debug
           pop
+          push_int 1337
+          set_field const('age')
+          get_field const('age')
+          debug
+          pop
+          dup
           push_str const('Yolo')
-          set_field const('Foo|name')
-          get_field const('Foo|name')
+          set_field const('name')
+          get_field const('name')
           debug
           ret
         end
@@ -138,11 +145,11 @@ ERROR
     end
 
     i = described_class.new(prog)
-    i.run
 
+    i.run
     #Kvm::Debugging::StepwiseDebugger.new(i).run
 
-    assert{ i.environment.debug_stream == [nil, 'Yolo'] }
+    assert{ i.environment.debug_stream == [nil, 1337, 'Yolo'] }
   end
 
   it 'creates an instance of a class'
