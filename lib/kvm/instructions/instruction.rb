@@ -58,8 +58,19 @@ module Kvm
       env.push_operand(v)
     end
 
+    DupN = Instruction.new(:dup_n, size: 2) do |env|
+      count = env.read_bytecode
+      v = env.top_operand
+      count.times { env.push_operand(v) }
+    end
+
     Pop = Instruction.new(:pop) do |env|
       env.pop_operand
+    end
+
+    PopN = Instruction.new(:pop_n, size: 2) do |env|
+      count = env.read_bytecode
+      count.times { env.pop_operand }
     end
 
     IfZero = Instruction.new(:if_zero, size: 2) do |env|

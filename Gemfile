@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
-gem 'active_support', require: false
-gem 'byebug', require: false
+gem 'activesupport', require: false
+gem 'pry', require: false
 
 group :test do
   gem 'rspec'

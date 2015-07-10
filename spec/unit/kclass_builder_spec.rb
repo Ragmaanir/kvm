@@ -9,5 +9,6 @@ describe Kvm::KClassBuilder do
     assert{ cls.name == 'String' }
     assert{ cls.superclass == 'Object' }
     assert{ cls.instance_methods.length == 1 }
+    assert{ cls.instance_methods.first.name == :length }
   end
 end

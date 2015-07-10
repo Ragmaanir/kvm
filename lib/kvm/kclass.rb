@@ -17,12 +17,22 @@ module Kvm
 
     def get_method(id)
       raise ArgumentError unless id
-      instance_methods.find{ |m| m.name.to_s == id } || raise("Could not find instance method #{id.inspect} in #{name}")
+      lookup_method(id) || raise("Could not find instance method #{id.inspect} in #{name}")
     end
 
     def get_object_method(id)
       raise ArgumentError unless id
       object_methods.find{ |m| m.name.to_s == id } || raise("Could not find object method #{id.inspect} in #{name}")
+    end
+
+  private
+
+    def lookup_method(id)
+      instance_methods.find{ |m| m.name.to_s == id } || lookup_method_in_superclass(id)
+    end
+
+    def lookup_method_in_superclass(id)
+      superclass.lookup_method(id) if superclass
     end
 
   end

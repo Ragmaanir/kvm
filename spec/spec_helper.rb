@@ -1,6 +1,6 @@
 require "kvm"
 require 'wrong'
-require 'byebug'
+require 'pry'
 
 RSpec.configure do |config|
   include Wrong

@@ -122,9 +122,7 @@ ERROR
       define_class('App') do
         class_method(:run) do
           allocate const('Foo')
-          dup
-          dup
-          dup
+          dup_n 3
           #call const('Foo#initialize')
           get_field const('name')
           debug
