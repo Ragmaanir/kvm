@@ -103,8 +103,8 @@ module Kvm
     end
 
     def breakpoint
-      require 'byebug'
-      byebug
+      require 'pry'
+      pry
     end
 
     def debug(data)
